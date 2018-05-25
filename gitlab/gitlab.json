@@ -1,0 +1,40 @@
+{
+  "builders": [
+    {
+      "type": "openstack",
+      "flavor": "flavor.A",
+      "region": "region1",
+      "image_name": "ubuntu1604-gitlab",
+      "source_image": "SOURCE_IMAGE_ID",
+      "networks": "NETWORK_ID",
+      "floating_ip_pool": "FLOATING_IP_POOL",
+      "use_floating_ip": true,
+      "ssh_username": "ubuntu",
+      "ssh_private_key_file": "/Users/peerapach/key.pem",
+      "ssh_keypair_name": "key",
+      "security_groups": ["default", "SSH"]
+    }
+  ],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+       "sudo apt-get update",
+       "sudo apt-get install -y curl openssh-server ca-certificates lighttpd libpam-cracklib",
+       "sudo curl -s https://raw.githubusercontent.com/peerapach/packer-openstack-examples/master/gitlab/index.html > /tmp/index.html",
+       "sudo mkdir -p /var/www/html /opt/cloud",
+       "sudo mv /tmp/index.html /var/www/html/index.html",
+       "curl -s https://raw.githubusercontent.com/peerapach/packer-openstack-examples/master/gitlab/first_login.sh > /tmp/first_login.sh",
+       "sudo mv /tmp/first_login.sh /opt/cloud/first_login.sh",
+       "echo 'bash /opt/cloud/first_login.sh' | sudo tee --append  /root/.bashrc",
+       "curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash",
+       "sudo EXTERNAL_URL='http://gitlab.example.com' apt-get install gitlab-ce",
+       "sudo gitlab-ctl reconfigure",
+       "curl -s https://raw.githubusercontent.com/peerapach/packer-openstack-examples/master/gitlab/gitlab.rb.cloud > /tmp/gitlab.rb.cloud",
+       "sudo mv /tmp/gitlab.rb.cloud /etc/gitlab/gitlab.rb.cloud",
+       "sudo systemctl disable gitlab-runsvdir.service",
+       "sudo rm -f /root/.ssh/authorized_keys",
+       "rm -f /home/ubuntu/.ssh/authorized_keys",
+       "sudo apt-get clean all"       
+    ]
+  }]
+}

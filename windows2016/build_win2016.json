@@ -1,0 +1,36 @@
+{
+    "builders": [
+        {
+            "type": "openstack",
+            "communicator": "winrm",
+            "winrm_username": "Administrator",
+            "winrm_password": "ADMIN_PASSWORD",
+            "winrm_insecure": "true",
+            "winrm_port":"5985",
+            "winrm_timeout":"300m",
+            "domain_name":"default",
+            "flavor": "flavor.A" ,
+            "tenant_id": "TENANT_ID",
+            "username":"OPENSTACK_USER",
+            "password":"OPENSTACK_PASSWORD",
+            "identity_endpoint": "https://IDENTITY.YOUR.DOMAIN/v3",
+            "image_name": "windows-2016-packer",
+            "source_image": "SOURCE_IMAGE_ID",
+            "networks": "NETWORK_ID",
+            "floating_ip_pool": "FLOATING_IP_POOL",
+            "use_floating_ip": true,
+            "security_groups": ["Allow_all"],
+            "region":"region1",
+            "insecure": true,
+            "user_data_file": "./userdata_win2016.ps1"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "scripts" : [
+                "./provision_win2016.ps1"
+            ]
+        }
+    ]
+}
